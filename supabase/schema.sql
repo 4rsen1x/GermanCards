@@ -41,9 +41,14 @@ CREATE POLICY "topics_select" ON public.topics
 CREATE POLICY "topics_insert" ON public.topics
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Users can update their own topics
+-- Owner can update their own topics (any field, including is_public)
+-- Any authenticated user can update columns of a public topic (but cannot change is_public or user_id)
+-- Combined into one policy so owner can still make a public topic private without WITH CHECK conflict
+DROP POLICY IF EXISTS "topics_update" ON public.topics;
 CREATE POLICY "topics_update" ON public.topics
-  FOR UPDATE USING (auth.uid() = user_id);
+  FOR UPDATE
+  USING  (auth.uid() = user_id OR  is_public = true)
+  WITH CHECK (auth.uid() = user_id OR  is_public = true);
 
 -- Users can delete their own topics
 CREATE POLICY "topics_delete" ON public.topics
