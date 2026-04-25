@@ -4,6 +4,7 @@ import { Header } from './components/Layout/Header'
 import { Sidebar } from './components/Layout/Sidebar'
 import { TopicList } from './components/Topics/TopicList'
 import { TopicAnalyzer } from './components/Topics/TopicAnalyzer'
+import { PublicTopicView } from './components/Topics/PublicTopicView'
 import { TranslationTooltip } from './components/Translator/TranslationTooltip'
 import { CreateTopicModal } from './components/Topics/CreateTopicModal'
 import { useThemeStore } from './store/themeStore'
@@ -13,9 +14,17 @@ import { useAutosave } from './hooks/useAutosave'
 import { useTranslation } from './hooks/useTranslation'
 import { GUEST_USER_ID } from './lib/constants'
 
+function parsePublicHash(hash: string): string | null {
+  const m = hash.match(/^#\/public\/([0-9a-f-]{36})$/i)
+  return m ? m[1] : null
+}
+
 export default function App() {
-  const [sidebarOpen,  setSidebarOpen]  = useState(false)
-  const [newTopicOpen, setNewTopicOpen] = useState(false)
+  const [sidebarOpen,    setSidebarOpen]    = useState(false)
+  const [newTopicOpen,   setNewTopicOpen]   = useState(false)
+  const [publicTopicId,  setPublicTopicId]  = useState<string | null>(
+    () => parsePublicHash(window.location.hash)
+  )
 
   const theme   = useThemeStore(s => s.theme)
   const user    = useAuthStore(s => s.user)
@@ -58,9 +67,21 @@ export default function App() {
     return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off) }
   }, [setOnline])
 
+  // Hash-based routing for public topic links
+  useEffect(() => {
+    const onHashChange = () => setPublicTopicId(parsePublicHash(window.location.hash))
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
   const handleNewTopic = useCallback(() => {
     setSidebarOpen(false)
     setNewTopicOpen(true)
+  }, [])
+
+  const handleClosePublic = useCallback(() => {
+    history.pushState(null, '', window.location.pathname)
+    setPublicTopicId(null)
   }, [])
 
   return (
@@ -68,26 +89,28 @@ export default function App() {
       <Header onMenuToggle={() => setSidebarOpen(v => !v)} />
 
       <div className="flex h-[calc(100vh-56px)] print:h-auto">
-        <Sidebar
-          isOpen={sidebarOpen}
-          onNewTopic={handleNewTopic}
-          onClose={() => setSidebarOpen(false)}
-        />
+        {!publicTopicId && (
+          <Sidebar
+            isOpen={sidebarOpen}
+            onNewTopic={handleNewTopic}
+            onClose={() => setSidebarOpen(false)}
+          />
+        )}
 
         <main className="flex-1 overflow-y-auto relative">
-          {/* Dot grid texture */}
           <div className="absolute inset-0 bg-dots-light dark:bg-dots-dark opacity-60 pointer-events-none" />
 
           <div className="relative z-10 h-full">
-            {currentId
-              ? <TopicAnalyzer topicId={currentId} />
-              : <TopicList onNewTopic={handleNewTopic} />
+            {publicTopicId
+              ? <PublicTopicView topicId={publicTopicId} onBack={handleClosePublic} />
+              : currentId
+                ? <TopicAnalyzer topicId={currentId} />
+                : <TopicList onNewTopic={handleNewTopic} />
             }
           </div>
         </main>
       </div>
 
-      {/* Translation tooltip */}
       {translation.selection && (
         <TranslationTooltip
           text={translation.selection.text}

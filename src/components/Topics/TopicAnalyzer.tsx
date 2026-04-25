@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react'
 import {
   Save, Plus, Trash2, Globe, Download,
-  ChevronLeft, Eye, EyeOff, Check, CloudOff,
+  ChevronLeft, Eye, EyeOff, Check, CloudOff, Link,
 } from 'lucide-react'
 import { useTopicsStore } from '../../store/topicsStore'
 import { ColumnCard } from './ColumnCard'
@@ -45,6 +45,11 @@ export function TopicAnalyzer({ topicId }: Props) {
     update(topicId, { is_public: !topic.is_public })
     toast.success(topic.is_public ? 'Privat' : 'Öffentlich')
   }, [topic, update, topicId])
+
+  const handleCopyLink = useCallback(() => {
+    const url = `${window.location.origin}${import.meta.env.BASE_URL}#/public/${topicId}`
+    navigator.clipboard.writeText(url).then(() => toast.success('Link kopiert!'))
+  }, [topicId])
 
   if (!topic) return null
 
@@ -113,6 +118,15 @@ export function TopicAnalyzer({ topicId }: Props) {
           >
             {topic.is_public ? <Globe size={16} /> : <EyeOff size={16} />}
           </button>
+          {topic.is_public && (
+            <button
+              onClick={handleCopyLink}
+              className="p-1.5 rounded-lg text-forest-500 hover:bg-forest-500/10 transition-colors"
+              title="Link kopieren"
+            >
+              <Link size={16} />
+            </button>
+          )}
           <button
             onClick={() => setPrintMode(v => !v)}
             className={`p-1.5 rounded-lg transition-colors ${printMode ? 'text-gold-500 bg-gold-500/10' : 'text-ink-400 hover:text-ink-600 dark:hover:text-ink-200 hover:bg-ink-100 dark:hover:bg-ink-800'}`}
