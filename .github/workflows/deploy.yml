@@ -35,7 +35,8 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
-          VITE_BASE_URL: ${{ vars.VITE_BASE_URL || '/' }}
+          # GITHUB_REPOSITORY is auto-set by Actions (e.g. "4rsen1x/GermanCards")
+          # vite.config.ts reads it to set base="/GermanCards/" automatically
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
