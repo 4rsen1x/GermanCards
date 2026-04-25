@@ -51,7 +51,17 @@ export const useAuthStore = create<AuthState>((set) => ({
   signUpEmail: async (email, password) => {
     if (!supabase) return
     set({ isLoading: true, error: null })
-    const { error } = await supabase.auth.signUp({ email, password })
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // Redirect back to whichever URL the app is running on (works for
+        // both localhost and the GitHub Pages deployment automatically)
+        // import.meta.env.BASE_URL is set at build time by Vite from vite.config base
+        // → "/GermanCards/" on GitHub Pages, "/" locally — always correct
+        emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
+      },
+    })
     if (error) set({ error: error.message })
     else set({ error: 'Bestätigungs-E-Mail gesendet! Bitte prüfe deinen Posteingang.' })
     set({ isLoading: false })

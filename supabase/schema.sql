@@ -49,6 +49,11 @@ CREATE POLICY "topics_update" ON public.topics
 CREATE POLICY "topics_delete" ON public.topics
   FOR DELETE USING (auth.uid() = user_id);
 
+-- ─── Role grants (required — RLS is checked AFTER table-level permissions) ───
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.topics TO authenticated;
+GRANT SELECT                         ON public.topics TO anon;
+
 -- ─── Realtime ────────────────────────────────────────────────────────────────
 
 -- Enable realtime for topics table
