@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# production
+dist/
+dist-ssr/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# misc
+.DS_Store
+*.local
