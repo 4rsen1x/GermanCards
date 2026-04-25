@@ -32,7 +32,7 @@ export function ColumnCard({ column, onChange, onRemove, printMode }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-ink-100 dark:border-ink-700/60">
         <h3
-          className="font-display text-sm font-semibold leading-tight"
+          className="font-display text-base font-semibold leading-tight"
           style={{ color: accentColor }}
         >
           {column.label}
@@ -51,7 +51,7 @@ export function ColumnCard({ column, onChange, onRemove, printMode }: Props) {
       {/* Content */}
       {printMode
         ? (
-          <div className="px-4 py-3 text-sm text-ink-800 dark:text-ink-100 whitespace-pre-wrap min-h-[80px] leading-relaxed">
+          <div className="px-4 py-3 text-base text-ink-800 dark:text-ink-100 whitespace-pre-wrap min-h-[80px] leading-relaxed">
             {column.content || <span className="text-ink-300 italic">—</span>}
           </div>
         )
@@ -62,7 +62,7 @@ export function ColumnCard({ column, onChange, onRemove, printMode }: Props) {
             onChange={e => { onChange(e.target.value); resize() }}
             onInput={resize}
             placeholder={`${column.label} …`}
-            className="flex-1 px-4 py-3 text-sm text-ink-800 dark:text-ink-100 bg-transparent resize-none focus:outline-none placeholder-ink-300 dark:placeholder-ink-600 leading-relaxed min-h-[120px]"
+            className="flex-1 px-4 py-3 text-base text-ink-800 dark:text-ink-100 bg-transparent resize-none focus:outline-none placeholder-ink-300 dark:placeholder-ink-600 leading-relaxed min-h-[120px]"
             style={{ height: 'auto' }}
           />
         )
